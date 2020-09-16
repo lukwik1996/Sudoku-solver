@@ -301,3 +301,11 @@ if __name__ == '__main__':
                         board_values[selected_cell[1]][selected_cell[0]] = 9
                     elif event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE:
                         board_values[selected_cell[1]][selected_cell[0]] = 0
+                    elif event.key == pygame.K_UP and selected_cell[1] > 0:
+                        selected_cell = (selected_cell[0], selected_cell[1] - 1)
+                    elif event.key == pygame.K_DOWN and selected_cell[1] < 8:
+                        selected_cell = (selected_cell[0], selected_cell[1] + 1)
+                    elif event.key == pygame.K_LEFT and selected_cell[0] > 0:
+                        selected_cell = (selected_cell[0] - 1, selected_cell[1])
+                    elif event.key == pygame.K_RIGHT and selected_cell[0] < 8:
+                        selected_cell = (selected_cell[0] + 1, selected_cell[1])
