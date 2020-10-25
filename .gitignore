@@ -6,3 +6,4 @@ __pycache__/sudoku.cpython-37.pyc
 .idea/modules.xml
 .idea/misc.xml
 .idea/inspectionProfiles/profiles_settings.xml
+__pycache__/sudoku_solver.cpython-37.pyc

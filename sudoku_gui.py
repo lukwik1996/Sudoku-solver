@@ -2,7 +2,7 @@ import pygame
 import sys
 import copy
 import time
-from sudoku import solve, clear
+from sudoku_solver import clear, copy_solved_cell, solve_board, solve_sudoku_region
 
 
 def exit_application():
@@ -44,6 +44,18 @@ def get_cell_by_mouse_coords(mouse_position, board_coords, cell_width):
     return None
 
 
+def fill_cell(value, coords):
+    if value == 0:
+        return
+    draw_text(coords, str(value), font, white)
+
+
+def fill_board(board, coords):
+    for y, row in enumerate(board):
+        for x, cell in enumerate(row):
+            fill_cell(board[y][x], coords[y][x])
+
+
 def draw_board(cell_width, board_width):
     thick = 3
     thin = 2
@@ -66,18 +78,6 @@ def draw_board(cell_width, board_width):
             continue
         pygame.draw.line(screen, color, (coord, 0), (coord, board_width), line_width)
         pygame.draw.line(screen, color, (0, coord), (board_width, coord), line_width)
-
-
-def fill_cell(value, coords):
-    if value == 0:
-        return
-    draw_text(coords, str(value), font, white)
-
-
-def fill_board(board, coords):
-    for y, row in enumerate(board):
-        for x, cell in enumerate(row):
-            fill_cell(board[y][x], coords[y][x])
 
 
 def draw_button(coords, size, text, color, action=None):
@@ -135,47 +135,10 @@ def draw(board, coords, cell_width, board_width, selected=None):
         pygame.display.update()
 
 
-def solve_board(board):
-    board_new = copy.deepcopy(board)
-    result = solve(board_new)
-
-    if result is False:
-        global solvable
-        solvable = False
-        return board
-
-    return board_new
-
-
-def copy_solved_cell(selected, board, board_new):
-    board[selected[1]][selected[0]] = board_new[selected[1]][selected[0]]
-
-
-def solve_sudoku_region(selected, board, region):
-    if selected is None:
-        return
-
-    board_new = solve_board(board)
-    # row
-    if region == 0:
-        for val in range(9):
-            selected_new = (val, selected[1])
-            copy_solved_cell(selected_new, board, board_new)
-    # column
-    elif region == 1:
-        for val in range(9):
-            selected_new = (selected[0], val)
-            copy_solved_cell(selected_new, board, board_new)
-
-    # square
-    elif region == 2:
-        # beginning of current square
-        x = selected[0] // 3 * 3
-        y = selected[1] // 3 * 3
-        for val_y in range(y, y + 3):
-            for val_x in range(x, x + 3):
-                selected_new = (val_x, val_y)
-                copy_solved_cell(selected_new, board, board_new)
+def highlight_selected(coords, size):
+    left = coords[0] - size / 2
+    top = coords[1] - size / 2
+    pygame.draw.rect(screen, highlight_frame_color, ((left, top), (size, size)), 2)
 
 
 def solve_puzzle():
@@ -205,12 +168,6 @@ def solve_square():
     solve_sudoku_region(selected_cell, board_values, 2)
 
 
-def highlight_selected(coords, size):
-    left = coords[0] - size / 2
-    top = coords[1] - size / 2
-    pygame.draw.rect(screen, highlight_frame_color, ((left, top), (size, size)), 2)
-
-
 if __name__ == '__main__':
 
     pygame.init()
@@ -237,7 +194,6 @@ if __name__ == '__main__':
     window_size = width, height = 1280, 720
 
     selected_cell = None
-    solvable = True
 
     screen = pygame.display.set_mode(window_size)
 
