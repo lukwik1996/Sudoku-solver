@@ -9,6 +9,8 @@ The `requirements.txt` file lists all Python libraries needed to run the applica
 pip install -r requirements.txt
 ```
 
+In order to run the application, run the sudoku_gui.py file.
+
 ## Functionality
 
 Currently the solver allows user to fill in the cells of a sudoku puzzle and decide if he wants to see the value(s) of:
