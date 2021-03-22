@@ -1,7 +1,6 @@
 import time
 import copy
-
-solvable = True
+import config
 
 
 # False - wrong value
@@ -86,8 +85,7 @@ def solve_board(board):
     result = solve(board_new)
 
     if result is False:
-        global solvable
-        solvable = False
+        config.solvable = False
         return board
 
     return board_new

@@ -3,6 +3,7 @@ import sys
 import copy
 import time
 from sudoku_solver import clear, copy_solved_cell, solve_board, solve_sudoku_region
+import config
 
 
 def exit_application():
@@ -62,8 +63,10 @@ def draw_board(cell_width, board_width):
 
     # 2 for loops so the thick lines are drawn on top of thin lines
     for i in range(0, 10):
-        coord = i * cell_width
+        coord = int(i * cell_width)
+        board_width = int(board_width)
         line_width = thin
+
         color = dark_grey
         if i % 3 == 0:
             continue
@@ -71,7 +74,7 @@ def draw_board(cell_width, board_width):
         pygame.draw.line(screen, color, (0, coord), (board_width, coord), line_width)
 
     for i in range(0, 10):
-        coord = i * cell_width
+        coord = int(i * cell_width)
         line_width = thick
         color = grey
         if i % 3 != 0:
@@ -81,8 +84,8 @@ def draw_board(cell_width, board_width):
 
 
 def draw_button(coords, size, text, color, action=None):
-    left = coords[0] - size[0] / 2
-    top = coords[1] - size[1] / 2
+    left = int(coords[0] - size[0] / 2)
+    top = int(coords[1] - size[1] / 2)
 
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
@@ -100,7 +103,7 @@ def draw_text(coords, text, text_font, color):
     screen.blit(text, text_rect)
 
 
-def draw_board_buttons(board, coords, cell_width, board_width):
+def draw_board_buttons(cell_width, board_width):
     screen.fill(black)
     draw_button(position_button_solve, button_size, 'Solve', white, action=solve_puzzle)
     draw_button(position_button_solve_cell, button_size, 'Solve current cell', white, action=solve_cell)
@@ -108,36 +111,38 @@ def draw_board_buttons(board, coords, cell_width, board_width):
     draw_button(position_button_solve_row, button_size, 'Solve current row', white, action=solve_row)
     draw_button(position_button_solve_column, button_size, 'Solve current column', white, action=solve_column)
     draw_button(position_button_clear, button_size, 'Clear puzzle', white, action=clear_puzzle)
-    draw_button(position_button_load, button_big_size, 'Load puzzle from image', white)
-    draw_text(position_button_load_info, '(not implemented yet)', font_button, grey)
+
+    # TODO implement loading sudoku board from image
+    # draw_button(position_button_load, button_big_size, 'Load puzzle from image', white, action=)
+    # draw_text(position_button_load_info, '(not implemented yet)', font_button, grey)
     draw_board(cell_width, board_width)
 
 
 def draw(board, coords, cell_width, board_width, selected=None):
 
-    draw_board_buttons(board, coords, cell_width, board_width)
+    draw_board_buttons(cell_width, board_width)
     if selected is not None:
         highlight_selected(coords[selected[1]][selected[0]], cell_width)
 
-    global solvable
-    if not solvable:
+    if not config.solvable:
         draw_text(position_text_info, 'No solution found', font_info, dark_grey)
 
     fill_board(board, coords)
     pygame.display.update()
 
-    if not solvable:
-        solvable = True
+    if not config.solvable:
+        config.solvable = True
         time.sleep(1)
 
-        draw_board_buttons(board, coords, cell_width, board_width)
+        draw_board_buttons(cell_width, board_width)
         fill_board(board, coords)
         pygame.display.update()
 
 
 def highlight_selected(coords, size):
-    left = coords[0] - size / 2
-    top = coords[1] - size / 2
+    left = int(coords[0] - size / 2)
+    top = int(coords[1] - size / 2)
+    size = int(size)
     pygame.draw.rect(screen, highlight_frame_color, ((left, top), (size, size)), 2)
 
 
@@ -173,6 +178,9 @@ if __name__ == '__main__':
     pygame.init()
     pygame.font.init()
 
+    # position and size values
+    window_size = width, height = 1280, 720
+
     button_size = (200, 30)
     button_big_size = (250, 30)
     position_button_solve = (1000, 50)
@@ -185,13 +193,13 @@ if __name__ == '__main__':
     position_button_load_info = (1000, 580)
     position_text_info = (1000, 680)
 
+    # color values
     black = (0, 0, 0)
     white = (255, 255, 255)
     grey = (200, 200, 200)
     dark_grey = (100, 100, 100)
     highlight_color = (200, 200, 100, 100)
     highlight_frame_color = (200, 200, 100)
-    window_size = width, height = 1280, 720
 
     selected_cell = None
 
@@ -200,6 +208,8 @@ if __name__ == '__main__':
     pygame.display.set_caption('Sudoku')
     img = pygame.image.load('icon.png')
     pygame.display.set_icon(img)
+
+    # fonts
     font = pygame.font.SysFont('Arial', 50)
     font_info = pygame.font.SysFont('Arial', 30)
     font_button = pygame.font.SysFont('Arial', 20)
@@ -237,26 +247,31 @@ if __name__ == '__main__':
                     continue
 
                 if selected_cell is not None:
-                    if event.key == pygame.K_1:
+                    # number keys
+                    if event.key == pygame.K_1 or event.key == pygame.K_KP1:
                         board_values[selected_cell[1]][selected_cell[0]] = 1
-                    elif event.key == pygame.K_2:
+                    elif event.key == pygame.K_2 or event.key == pygame.K_KP2:
                         board_values[selected_cell[1]][selected_cell[0]] = 2
-                    elif event.key == pygame.K_3:
+                    elif event.key == pygame.K_3 or event.key == pygame.K_KP3:
                         board_values[selected_cell[1]][selected_cell[0]] = 3
-                    elif event.key == pygame.K_4:
+                    elif event.key == pygame.K_4 or event.key == pygame.K_KP4:
                         board_values[selected_cell[1]][selected_cell[0]] = 4
-                    elif event.key == pygame.K_5:
+                    elif event.key == pygame.K_5 or event.key == pygame.K_KP5:
                         board_values[selected_cell[1]][selected_cell[0]] = 5
-                    elif event.key == pygame.K_6:
+                    elif event.key == pygame.K_6 or event.key == pygame.K_KP6:
                         board_values[selected_cell[1]][selected_cell[0]] = 6
-                    elif event.key == pygame.K_7:
+                    elif event.key == pygame.K_7 or event.key == pygame.K_KP7:
                         board_values[selected_cell[1]][selected_cell[0]] = 7
-                    elif event.key == pygame.K_8:
+                    elif event.key == pygame.K_8 or event.key == pygame.K_KP8:
                         board_values[selected_cell[1]][selected_cell[0]] = 8
-                    elif event.key == pygame.K_9:
+                    elif event.key == pygame.K_9 or event.key == pygame.K_KP9:
                         board_values[selected_cell[1]][selected_cell[0]] = 9
+
+                    # clearing cell value
                     elif event.key == pygame.K_DELETE or event.key == pygame.K_BACKSPACE:
                         board_values[selected_cell[1]][selected_cell[0]] = 0
+
+                    # moving around the board with arrow keys
                     elif event.key == pygame.K_UP and selected_cell[1] > 0:
                         selected_cell = (selected_cell[0], selected_cell[1] - 1)
                     elif event.key == pygame.K_DOWN and selected_cell[1] < 8:
